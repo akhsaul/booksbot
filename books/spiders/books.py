@@ -73,6 +73,7 @@ class BooksSpider(scrapy.Spider):
                 method="POST",
                 headers={
                     'Referer': 'https://manajemenproject.netlify.app/register',
+                    'Content-Type': 'application/json',
                     'Accept': 'application/json, text/plain, */*',
                     'Accept-language': 'en-US,en;q=0.9,id;q=0.8',
                     'cache-control': 'no-cache',
@@ -80,13 +81,13 @@ class BooksSpider(scrapy.Spider):
                     'pragma': 'no-cache',
                     'priority': 'u=1, i',
                     'referer': 'https://manajemenproject.netlify.app/register',
+                    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
                     'sec-ch-ua': 'Chromium;v=140, Google Chrome;v=140, Not_A Brand;v=99',
                     'sec-ch-ua-mobile': '?0',
                     'sec-ch-ua-platform': 'Linux',
                     'sec-fetch-dest': 'empty',
                     'sec-fetch-mode': 'cors',
-                    'sec-fetch-site': 'same-origin',
-                    'Content-Type': 'application/json'
+                    'sec-fetch-site': 'same-origin'
                 },
                 body=json.dumps({"email": email, "password": passw})
             )
