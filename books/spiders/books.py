@@ -66,7 +66,7 @@ class BooksSpider(scrapy.Spider):
             email = rand_str + '@gmail.com'
             passw = rand_str
             self.logger.log(logging.DEBUG,f"New data: ${rand_str}")
-            scrapy.Request(
+            yield scrapy.Request(
                 url,
                 callback=self.callback_response,
                 method="POST",
