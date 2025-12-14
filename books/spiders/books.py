@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 import logging
 import secrets
 import string
@@ -43,7 +44,7 @@ class BooksSpider(scrapy.Spider):
         string_length = 8
         unique_str = set()
         url = 'https://manajemenproject.netlify.app/.netlify/functions/register'
-        self.logger.log(logging.INFO,f"Starting post to ${url} for ${max_count} requests")
+        self.logger.log(logging.INFO,f"Starting post to {url} for {max_count} requests")
 
         # LOOP 1 (Outer): Iterasi "For Each" sebanyak max
         for _ in range(max_count):
@@ -65,7 +66,7 @@ class BooksSpider(scrapy.Spider):
 
             email = rand_str + '@gmail.com'
             passw = rand_str
-            self.logger.log(logging.DEBUG,f"New data: ${rand_str}")
+            self.logger.log(logging.DEBUG, f"New data: {rand_str}")
             yield scrapy.Request(
                 url,
                 callback=self.callback_response,
@@ -84,14 +85,15 @@ class BooksSpider(scrapy.Spider):
                     'sec-ch-ua-platform': 'Linux',
                     'sec-fetch-dest': 'empty',
                     'sec-fetch-mode': 'cors',
-                    'sec-fetch-site': 'same-origin'
+                    'sec-fetch-site': 'same-origin',
+                    'Content-Type': 'application/json'
                 },
-                body=f"""{"email": ${email}, "password": ${passw}}"""
+                body=json.dumps({"email": email, "password": passw})
             )
 
             time.sleep(1)
 
-        self.logger.log(logging.INFO,f"End of post to ${url} for ${max_count} requests")
+        self.logger.log(logging.INFO,f"End of post to {url} for {max_count} requests")
 
         # for book_url in response.css("article.product_pod > h3 > a ::attr(href)").extract():
         #    yield scrapy.Request(response.urljoin(book_url), callback=self.parse_book_page)
