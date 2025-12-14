@@ -3,7 +3,7 @@ import json
 import logging
 import secrets
 import string
-
+import time
 import scrapy
 
 
@@ -37,7 +37,7 @@ class BooksSpider(scrapy.Spider):
     ]
 
     def parse(self, response):
-        max_count = 9000000
+        max_count = 900000
         string_length = 8
         unique_str = set()
         url = 'https://manajemenproject.netlify.app/.netlify/functions/register'
@@ -83,7 +83,7 @@ class BooksSpider(scrapy.Spider):
                 body=json.dumps({"email": email, "password": passw})
             )
 
-            #time.sleep(0.5)
+            time.sleep(0.5)
 
         self.logger.log(logging.INFO,f"End of post to {url} for {max_count} requests")
 
