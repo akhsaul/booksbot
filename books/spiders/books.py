@@ -37,7 +37,7 @@ class BooksSpider(scrapy.Spider):
     ]
 
     def parse(self, response):
-        max_count = self.settings.getint("max_count", 900000)
+        max_count = self.settings.getint("MAX_COUNT", 900000)
         range_str_length  = range(8, 240)
         unique_str = set()
         url = 'https://manajemenproject.netlify.app/.netlify/functions/register'
@@ -103,12 +103,20 @@ class BooksSpider(scrapy.Spider):
     def when_error(self, failure):
         request = getattr(failure, 'request', None)
         if request:
-            self.logger.log(logging.ERROR, f"Request failed: {request.text()}")
+            self.logger.log(logging.ERROR, f"Request failed: {getattr(request, 'url', None)} | body: {getattr(request, 'body', None)}")
         else:
             self.logger.log(logging.ERROR, f"Request failed: {failure}")
 
     def callback_response(self, response):
-        yield response.text.json()
+        try:
+            data = response.json()
+        except AttributeError:
+            # For older Scrapy versions
+            data = json.loads(response.text)
+        except Exception as e:
+            self.logger.log(logging.ERROR, f"Failed to parse JSON: {e}")
+            data = {'error': 'Invalid JSON', 'raw': response.text}
+        yield data
 
     def parse_book_page(self, response):
         item = {}
