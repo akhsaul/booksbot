@@ -3,7 +3,6 @@ import json
 import logging
 import secrets
 import string
-import time
 
 import scrapy
 
@@ -23,9 +22,7 @@ def generate_unique_batch_string(count, length=8):
     """
     unique_codes = set()
 
-    # Loop terus berjalan sampai jumlah kode unik terpenuhi
     while len(unique_codes) < count:
-        # Anda bisa ganti ke generate_secure_string() jika butuh keamanan tinggi
         code = generate_secure_string(length)
         unique_codes.add(code)
 
@@ -40,26 +37,20 @@ class BooksSpider(scrapy.Spider):
     ]
 
     def parse(self, response):
-        max_count = 90000
+        max_count = 9000000
         string_length = 8
         unique_str = set()
         url = 'https://manajemenproject.netlify.app/.netlify/functions/register'
         self.logger.log(logging.INFO,f"Starting post to {url} for {max_count} requests")
 
-        # LOOP 1 (Outer): Iterasi "For Each" sebanyak max
         for _ in range(max_count):
 
-            # Tentukan target panjang set untuk iterasi saat ini.
-            # Jika sekarang len 0, targetnya jadi 1. Jika len 5, targetnya jadi 6.
             target_len = len(unique_str) + 1
 
-            # LOOP 2 (Inner): Loop validasi menggunakan Len
-            # Loop ini akan terus berputar selama len belum mencapai target (belum berubah)
             rand_str = None
             while len(unique_str) < target_len:
                 rand_str = generate_secure_string(string_length)
 
-                # Coba masukkan ke set.
                 # Sifat set: Jika item duplikat, dia ditolak dan Len TIDAK berubah.
                 # Jika item unik, dia diterima dan Len BERUBAH (+1).
                 unique_str.add(rand_str)
@@ -92,7 +83,7 @@ class BooksSpider(scrapy.Spider):
                 body=json.dumps({"email": email, "password": passw})
             )
 
-            time.sleep(1)
+            #time.sleep(0.5)
 
         self.logger.log(logging.INFO,f"End of post to {url} for {max_count} requests")
 
