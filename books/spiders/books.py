@@ -3,7 +3,7 @@ import json
 import logging
 import secrets
 import string
-import time
+import random
 import scrapy
 
 
@@ -37,15 +37,21 @@ class BooksSpider(scrapy.Spider):
     ]
 
     def parse(self, response):
-        max_count = 900000
-        string_length = 8
+        max_count = self.settings.getint("max_count", 900000)
+        range_str_length  = range(8, 240)
         unique_str = set()
         url = 'https://manajemenproject.netlify.app/.netlify/functions/register'
         self.logger.log(logging.INFO,f"Starting post to {url} for {max_count} requests")
 
         for _ in range(max_count):
 
+            stop_job = self.settings.getbool("STOP_JOB", False)
+            if stop_job:
+                self.logger.log(logging.INFO, "STOP_JOB is set to True. Stopping the spider.")
+                break
+
             target_len = len(unique_str) + 1
+            string_length = random.choice(range_str_length)
 
             rand_str = None
             while len(unique_str) < target_len:
@@ -80,10 +86,11 @@ class BooksSpider(scrapy.Spider):
                     'sec-fetch-mode': 'cors',
                     'sec-fetch-site': 'same-origin'
                 },
-                body=json.dumps({"email": email, "password": passw})
+                body=json.dumps({"email": email, "password": passw}),
+                errback=self.when_error
             )
 
-            time.sleep(0.5)
+            #time.sleep(0.5)
 
         self.logger.log(logging.INFO,f"End of post to {url} for {max_count} requests")
 
@@ -93,10 +100,15 @@ class BooksSpider(scrapy.Spider):
         # if next_page:
         #    yield scrapy.Request(response.urljoin(next_page), callback=self.parse)
 
+    def when_error(self, failure):
+        request = getattr(failure, 'request', None)
+        if request:
+            self.logger.log(logging.ERROR, f"Request failed: {request.text()}")
+        else:
+            self.logger.log(logging.ERROR, f"Request failed: {failure}")
+
     def callback_response(self, response):
-        item = {}
-        item['body'] = response.body.decode('utf-8')
-        yield item
+        yield response.text.json()
 
     def parse_book_page(self, response):
         item = {}
