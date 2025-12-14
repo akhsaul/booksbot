@@ -33,9 +33,9 @@ def generate_unique_batch_string(count, length=8):
 
 class BooksSpider(scrapy.Spider):
     name = "books"
-    allowed_domains = ["books.toscrape.com"]
+    allowed_domains = ["manajemenproject.netlify.app"]
     start_urls = [
-        'http://books.toscrape.com/',
+        'https://manajemenproject.netlify.app',
     ]
 
     def parse(self, response):
