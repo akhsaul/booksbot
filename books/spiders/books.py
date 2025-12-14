@@ -104,7 +104,7 @@ class BooksSpider(scrapy.Spider):
 
     def callback_response(self, response):
         item = {}
-        item['body'] = response.body()
+        item['body'] = response.body.decode('utf-8')
         yield item
 
     def parse_book_page(self, response):
